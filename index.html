@@ -2,25 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Olegit Quiz App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeChampion Quiz App</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="quiz-container">
-    <h1>JavaScript Quiz</h1>
-    <div id="quiz-box">
-      <div id="question-number"></div>
-      <h2 id="question-text"></h2>
-      <ul id="answer-list"></ul>
-      <button id="next-btn">Next</button>
-      <div id="result-box" class="hidden">
-        <h2>Quiz Completed</h2>
-        <p id="score"></p>
-        <button id="restart-btn">Restart Quiz</button>
+  <div class="quiz-app">
+    <header>
+      <h1>CodeChampion 🧠</h1>
+      <div id="progress-bar"><div id="progress"></div></div>
+    </header>
+
+    <main id="quiz-container">
+      <div id="question-meta">
+        <span id="question-number"></span>
+        <span id="question-difficulty"></span>
       </div>
-    </div>
+      <pre id="question-text"></pre>
+      <ul id="answer-options"></ul>
+      <p id="explanation" class="hidden"></p>
+      <button id="next-btn" disabled>Next ➡️</button>
+    </main>
+
+    <section id="result-screen" class="hidden">
+      <h2>🎯 Your Score: <span id="final-score"></span></h2>
+      <p id="result-message"></p>
+      <button id="restart-btn">Restart 🔁</button>
+    </section>
   </div>
+
+  <script src="questions.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
