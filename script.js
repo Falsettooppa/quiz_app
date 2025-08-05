@@ -1,99 +1,82 @@
-const questions = [
-  {
-    question: "What is the output of: console.log(typeof null)?",
-    answers: ["null", "object", "undefined", "number"],
-    correct: "object"
-  },
-  {
-    question: "Which keyword declares a constant in JavaScript?",
-    answers: ["var", "let", "const", "define"],
-    correct: "const"
-  },
-  {
-    question: "What does DOM stand for?",
-    answers: ["Document Object Model", "Data Output Method", "Document Oriented Module", "Display Object Model"],
-    correct: "Document Object Model"
-  },
-  {
-    question: "Which method converts a JSON string to a JavaScript object?",
-    answers: ["JSON.parse()", "JSON.stringify()", "JSON.convert()", "JSON.toObj()"],
-    correct: "JSON.parse()"
-  },
-  {
-    question: "Which of the following is a primitive type?",
-    answers: ["Object", "Array", "String", "Function"],
-    correct: "String"
-  },
-  // 👉 Add up to 50 similar questions below...
-];
-
-let currentIndex = 0;
+let currentQuestion = 0;
 let score = 0;
 
-const questionNumber = document.getElementById("question-number");
 const questionText = document.getElementById("question-text");
-const answerList = document.getElementById("answer-list");
+const answerOptions = document.getElementById("answer-options");
+const questionNumber = document.getElementById("question-number");
+const questionDifficulty = document.getElementById("question-difficulty");
+const explanation = document.getElementById("explanation");
 const nextBtn = document.getElementById("next-btn");
-const resultBox = document.getElementById("result-box");
-const scoreText = document.getElementById("score");
+const progress = document.getElementById("progress");
+const resultScreen = document.getElementById("result-screen");
+const quizContainer = document.getElementById("quiz-container");
+const finalScore = document.getElementById("final-score");
+const resultMessage = document.getElementById("result-message");
 const restartBtn = document.getElementById("restart-btn");
 
-function showQuestion() {
-  const current = questions[currentIndex];
-  questionNumber.innerText = `Question ${currentIndex + 1} of ${questions.length}`;
-  questionText.innerText = current.question;
-  answerList.innerHTML = "";
-  
-  current.answers.forEach(answer => {
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  questionText.textContent = q.question;
+  questionNumber.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+  questionDifficulty.textContent = `Difficulty: ${q.difficulty || 'N/A'}`;
+  explanation.classList.add("hidden");
+  nextBtn.disabled = true;
+
+  answerOptions.innerHTML = "";
+  q.options.forEach(option => {
     const li = document.createElement("li");
     const btn = document.createElement("button");
-    btn.innerText = answer;
-    btn.onclick = () => selectAnswer(btn, current.correct);
+    btn.textContent = option;
+    btn.onclick = () => handleAnswer(btn, q.correct, q.explanation);
     li.appendChild(btn);
-    answerList.appendChild(li);
+    answerOptions.appendChild(li);
   });
+
+  progress.style.width = ((currentQuestion / questions.length) * 100) + "%";
 }
 
-function selectAnswer(button, correctAnswer) {
-  const allButtons = answerList.querySelectorAll("button");
-  allButtons.forEach(btn => {
+function handleAnswer(button, correct, explain) {
+  const buttons = answerOptions.querySelectorAll("button");
+  buttons.forEach(btn => {
     btn.disabled = true;
-    if (btn.innerText === correctAnswer) {
-      btn.style.backgroundColor = "green";
-      btn.style.color = "white";
-    } else {
-      btn.style.backgroundColor = "crimson";
-      btn.style.color = "white";
-    }
+    if (btn.textContent === correct) btn.classList.add("correct");
+    if (btn !== button && btn.textContent !== correct) btn.classList.add("wrong");
   });
 
-  if (button.innerText === correctAnswer) {
+  if (button.textContent === correct) {
     score++;
   }
+
+  explanation.textContent = "📘 " + explain;
+  explanation.classList.remove("hidden");
+  nextBtn.disabled = false;
 }
 
 nextBtn.onclick = () => {
-  currentIndex++;
-  if (currentIndex < questions.length) {
-    showQuestion();
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    renderQuestion();
   } else {
     showResult();
   }
 };
 
 function showResult() {
-  document.getElementById("quiz-box").classList.add("hidden");
-  resultBox.classList.remove("hidden");
-  scoreText.innerText = `You scored ${score} out of ${questions.length}`;
+  quizContainer.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+  finalScore.textContent = `${score} / ${questions.length}`;
+  resultMessage.textContent = score >= questions.length * 0.8
+    ? "🏆 Excellent! You're a CodeChampion."
+    : "📘 Keep practising. You'll get there!";
 }
 
 restartBtn.onclick = () => {
-  currentIndex = 0;
+  currentQuestion = 0;
   score = 0;
-  resultBox.classList.add("hidden");
-  document.getElementById("quiz-box").classList.remove("hidden");
-  showQuestion();
+  resultScreen.classList.add("hidden");
+  quizContainer.classList.remove("hidden");
+  renderQuestion();
 };
 
-// Initialize
-showQuestion();
+// INIT
+renderQuestion();
