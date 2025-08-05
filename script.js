@@ -1,104 +1,124 @@
-const questionBox = document.getElementById("question-box");
-const answersBox = document.getElementById("answers");
-const nextBtn = document.getElementById("next-btn");
-const scoreBox = document.getElementById("score-box");
-const scoreText = document.getElementById("score");
-const timerText = document.getElementById("time");
-const progressText = document.getElementById("progress");
-const difficultyTag = document.getElementById("difficulty");
-const currentQuestionSpan = document.getElementById("current");
-const totalQuestionsSpan = document.getElementById("total");
+const startBtn = document.getElementById('start-btn');
+const difficultySelect = document.getElementById('difficulty');
+const quizBox = document.getElementById('quiz-box');
+const questionEl = document.getElementById('question');
+const optionsEl = document.getElementById('answers'); // Assuming answers = options container
+const nextBtn = document.getElementById('next-btn');
+const resultBox = document.getElementById('score-box'); // Reused score-box as result box
+const scoreEl = document.getElementById('score');
+const timeEl = document.getElementById('time');
+const currentQuestionSpan = document.getElementById('current');
+const totalQuestionsSpan = document.getElementById('total');
+const difficultyTag = document.getElementById('difficulty-level'); // Add this span in HTML
 
 let currentIndex = 0;
 let score = 0;
-let timeLeft = 30;
+let currentQuestions = [];
+let timeLeft = 15;
 let timer;
 
-// 👇 Choose difficulty level here (can be set dynamically later)
-const selectedDifficulty = "medium"; // Options: "easy", "medium", "hard"
-
-// 👇 Filter questions by difficulty
-const filteredQuestions = questions.filter(q => q.difficulty === selectedDifficulty);
-totalQuestionsSpan.innerText = filteredQuestions.length;
+startBtn.addEventListener('click', startQuiz);
+nextBtn.addEventListener('click', loadNextQuestion);
 
 function startQuiz() {
-  showQuestion();
-  nextBtn.addEventListener("click", handleNext);
+    const difficulty = difficultySelect.value;
+    currentQuestions = [...window.allQuestions[difficulty]];
+    shuffle(currentQuestions);
+
+    startBtn.style.display = 'none';
+    difficultySelect.disabled = true;
+    quizBox.classList.remove('hidden');
+    resultBox.classList.add('hidden');
+
+    totalQuestionsSpan.textContent = Math.min(50, currentQuestions.length);
+    currentIndex = 0;
+    score = 0;
+    loadQuestion();
 }
 
-function showQuestion() {
-  resetState();
-  const current = filteredQuestions[currentIndex];
-  questionBox.innerText = current.question;
-  difficultyTag.innerText = `Difficulty: ${current.difficulty.toUpperCase()}`;
-  current.options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.classList.add("answer-btn");
-    btn.innerText = option;
-    btn.onclick = () => selectAnswer(btn, current.answer);
-    answersBox.appendChild(btn);
-  });
-  currentQuestionSpan.innerText = currentIndex + 1;
-  startTimer();
+function loadQuestion() {
+    resetState();
+
+    const current = currentQuestions[currentIndex];
+    questionEl.textContent = current.question;
+    difficultyTag.textContent = `Difficulty: ${current.difficulty?.toUpperCase() || ''}`;
+    currentQuestionSpan.textContent = currentIndex + 1;
+
+    current.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.classList.add("option-btn");
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt);
+        optionsEl.appendChild(btn);
+    });
+
+    startTimer();
 }
 
 function resetState() {
-  clearInterval(timer);
-  timeLeft = 30;
-  timerText.innerText = timeLeft;
-  answersBox.innerHTML = "";
-  nextBtn.disabled = true;
-}
-
-function selectAnswer(button, correctAnswer) {
-  clearInterval(timer);
-  const isCorrect = button.innerText === correctAnswer;
-  if (isCorrect) {
-    button.style.backgroundColor = "#00b894"; // green
-    score++;
-  } else {
-    button.style.backgroundColor = "#d63031"; // red
-  }
-
-  // Highlight correct answer
-  Array.from(answersBox.children).forEach(btn => {
-    btn.disabled = true;
-    if (btn.innerText === correctAnswer) {
-      btn.style.border = "2px solid #00b894";
-    }
-  });
-
-  nextBtn.disabled = false;
-}
-
-function handleNext() {
-  currentIndex++;
-  if (currentIndex < filteredQuestions.length) {
-    showQuestion();
-  } else {
-    showScore();
-  }
+    clearInterval(timer);
+    timeLeft = 15;
+    timeEl.textContent = timeLeft;
+    nextBtn.disabled = true;
+    optionsEl.innerHTML = "";
 }
 
 function startTimer() {
-  timerText.innerText = timeLeft;
-  timer = setInterval(() => {
-    timeLeft--;
-    timerText.innerText = timeLeft;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      handleNext(); // Auto move to next on timeout
+    timer = setInterval(() => {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            nextBtn.disabled = false;
+            disableOptions();
+        }
+    }, 1000);
+}
+
+function checkAnswer(button, selected) {
+    clearInterval(timer);
+    const correct = currentQuestions[currentIndex].answer;
+    const isCorrect = selected === correct;
+    if (isCorrect) {
+        score++;
+        button.style.background = "#00b894"; // green
+    } else {
+        button.style.background = "#d63031"; // red
     }
-  }, 1000);
+
+    disableOptions(correct);
+    nextBtn.disabled = false;
 }
 
-function showScore() {
-  document.querySelector(".quiz-header").style.display = "none";
-  questionBox.style.display = "none";
-  answersBox.style.display = "none";
-  nextBtn.style.display = "none";
-  scoreBox.classList.remove("hide");
-  scoreText.innerText = `${score} / ${filteredQuestions.length}`;
+function disableOptions(correctAnswer) {
+    Array.from(optionsEl.children).forEach(btn => {
+        btn.disabled = true;
+        if (correctAnswer && btn.textContent === correctAnswer) {
+            btn.style.border = "2px solid #00b894"; // highlight correct
+        }
+    });
 }
 
-startQuiz();
+function loadNextQuestion() {
+    currentIndex++;
+    if (currentIndex < Math.min(50, currentQuestions.length)) {
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    quizBox.classList.add('hidden');
+    resultBox.classList.remove('hidden');
+    scoreEl.textContent = `${score} / ${Math.min(50, currentQuestions.length)}`;
+    startBtn.style.display = 'inline-block';
+    difficultySelect.disabled = false;
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}

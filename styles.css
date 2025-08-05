@@ -181,3 +181,9 @@ button:hover {
   margin-top: 1rem;
   font-size: 1.2rem;
 }
+#score-box p {
+  margin: 0.5rem 0;
+}
+#score-box span {
+  font-weight: bold;
+}

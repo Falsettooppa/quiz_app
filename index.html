@@ -1,40 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CodeChampion Quiz App</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="quiz-app">
-    <header>
-      <h1>CodeChampion 🧠</h1>
-      <div id="progress-bar"><div id="progress"></div></div>
-    </header>
-
-    <main id="quiz-container">
-      <div id="question-meta">
-        <span id="question-number"></span>
-        <span id="question-difficulty"></span>
-      </div>
-      <pre id="question-text"></pre>
-      <ul id="answer-options"></ul>
-      <p id="explanation" class="hidden"></p>
-      <button id="next-btn" disabled>Next ➡️</button>
-    </main>
-
-    <section id="result-screen" class="hidden">
-      <h2>🎯 Your Score: <span id="final-score"></span></h2>
-      <p id="result-message"></p>
-      <button id="restart-btn">Restart 🔁</button>
-    </section>
-  </div>
-
-  <script src="question.js"></script>
-  <script src="script.js"></script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,19 +10,41 @@
   <div class="quiz-container">
     <div class="quiz-header">
       <h1>CodeMaster Quiz</h1>
-      <div id="progress">Question <span id="current">1</span> of <span id="total">50</span></div>
-      <div id="timer">Time Left: <span id="time">30</span>s</div>
-      <div id="difficulty"></div>
+
+      <!-- Difficulty selection before quiz starts -->
+      <div id="setup">
+        <label for="difficulty">Select Difficulty:</label>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button id="start-btn">Start Quiz</button>
+      </div>
+
+      <!-- Dynamic info during quiz -->
+      <div id="progress" class="hidden">
+        Question <span id="current">1</span> of <span id="total">50</span>
+      </div>
+      <div id="timer" class="hidden">Time Left: <span id="time">15</span>s</div>
+      <div id="difficulty-level" class="hidden"></div>
     </div>
-    <div id="question-box"></div>
-    <div id="answers"></div>
-    <button id="next-btn">Next</button>
-    <div id="score-box" class="hide">
+
+    <!-- Quiz body -->
+    <div id="quiz-box" class="hidden">
+      <div id="question"></div>
+      <div id="answers"></div>
+      <button id="next-btn" disabled>Next</button>
+    </div>
+
+    <!-- Final score -->
+    <div id="score-box" class="hidden">
       <h2>Quiz Completed!</h2>
       <p>Your score: <span id="score"></span>/50</p>
       <button onclick="location.reload()">Restart</button>
     </div>
   </div>
+
   <script src="question.js"></script>
   <script src="script.js"></script>
 </body>
