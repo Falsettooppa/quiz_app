@@ -1,4 +1,4 @@
-# JavaScript Quiz App
+# CodeMaster Quiz App
 
 A responsive and interactive quiz application built using **HTML**, **CSS**, and **JavaScript**. Developed as the **Week 3 Assignment** for the Web2 Advanced class at **Web3Bridge**.
 
