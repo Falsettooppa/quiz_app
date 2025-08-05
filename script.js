@@ -1,82 +1,104 @@
-let currentQuestion = 0;
-let score = 0;
-
-const questionText = document.getElementById("question-text");
-const answerOptions = document.getElementById("answer-options");
-const questionNumber = document.getElementById("question-number");
-const questionDifficulty = document.getElementById("question-difficulty");
-const explanation = document.getElementById("explanation");
+const questionBox = document.getElementById("question-box");
+const answersBox = document.getElementById("answers");
 const nextBtn = document.getElementById("next-btn");
-const progress = document.getElementById("progress");
-const resultScreen = document.getElementById("result-screen");
-const quizContainer = document.getElementById("quiz-container");
-const finalScore = document.getElementById("final-score");
-const resultMessage = document.getElementById("result-message");
-const restartBtn = document.getElementById("restart-btn");
+const scoreBox = document.getElementById("score-box");
+const scoreText = document.getElementById("score");
+const timerText = document.getElementById("time");
+const progressText = document.getElementById("progress");
+const difficultyTag = document.getElementById("difficulty");
+const currentQuestionSpan = document.getElementById("current");
+const totalQuestionsSpan = document.getElementById("total");
 
-function renderQuestion() {
-  const q = questions[currentQuestion];
-  questionText.textContent = q.question;
-  questionNumber.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
-  questionDifficulty.textContent = `Difficulty: ${q.difficulty || 'N/A'}`;
-  explanation.classList.add("hidden");
-  nextBtn.disabled = true;
+let currentIndex = 0;
+let score = 0;
+let timeLeft = 30;
+let timer;
 
-  answerOptions.innerHTML = "";
-  q.options.forEach(option => {
-    const li = document.createElement("li");
-    const btn = document.createElement("button");
-    btn.textContent = option;
-    btn.onclick = () => handleAnswer(btn, q.correct, q.explanation);
-    li.appendChild(btn);
-    answerOptions.appendChild(li);
-  });
+// 👇 Choose difficulty level here (can be set dynamically later)
+const selectedDifficulty = "medium"; // Options: "easy", "medium", "hard"
 
-  progress.style.width = ((currentQuestion / questions.length) * 100) + "%";
+// 👇 Filter questions by difficulty
+const filteredQuestions = questions.filter(q => q.difficulty === selectedDifficulty);
+totalQuestionsSpan.innerText = filteredQuestions.length;
+
+function startQuiz() {
+  showQuestion();
+  nextBtn.addEventListener("click", handleNext);
 }
 
-function handleAnswer(button, correct, explain) {
-  const buttons = answerOptions.querySelectorAll("button");
-  buttons.forEach(btn => {
-    btn.disabled = true;
-    if (btn.textContent === correct) btn.classList.add("correct");
-    if (btn !== button && btn.textContent !== correct) btn.classList.add("wrong");
+function showQuestion() {
+  resetState();
+  const current = filteredQuestions[currentIndex];
+  questionBox.innerText = current.question;
+  difficultyTag.innerText = `Difficulty: ${current.difficulty.toUpperCase()}`;
+  current.options.forEach(option => {
+    const btn = document.createElement("button");
+    btn.classList.add("answer-btn");
+    btn.innerText = option;
+    btn.onclick = () => selectAnswer(btn, current.answer);
+    answersBox.appendChild(btn);
   });
+  currentQuestionSpan.innerText = currentIndex + 1;
+  startTimer();
+}
 
-  if (button.textContent === correct) {
+function resetState() {
+  clearInterval(timer);
+  timeLeft = 30;
+  timerText.innerText = timeLeft;
+  answersBox.innerHTML = "";
+  nextBtn.disabled = true;
+}
+
+function selectAnswer(button, correctAnswer) {
+  clearInterval(timer);
+  const isCorrect = button.innerText === correctAnswer;
+  if (isCorrect) {
+    button.style.backgroundColor = "#00b894"; // green
     score++;
+  } else {
+    button.style.backgroundColor = "#d63031"; // red
   }
 
-  explanation.textContent = "📘 " + explain;
-  explanation.classList.remove("hidden");
+  // Highlight correct answer
+  Array.from(answersBox.children).forEach(btn => {
+    btn.disabled = true;
+    if (btn.innerText === correctAnswer) {
+      btn.style.border = "2px solid #00b894";
+    }
+  });
+
   nextBtn.disabled = false;
 }
 
-nextBtn.onclick = () => {
-  currentQuestion++;
-  if (currentQuestion < questions.length) {
-    renderQuestion();
+function handleNext() {
+  currentIndex++;
+  if (currentIndex < filteredQuestions.length) {
+    showQuestion();
   } else {
-    showResult();
+    showScore();
   }
-};
-
-function showResult() {
-  quizContainer.classList.add("hidden");
-  resultScreen.classList.remove("hidden");
-  finalScore.textContent = `${score} / ${questions.length}`;
-  resultMessage.textContent = score >= questions.length * 0.8
-    ? "🏆 Excellent! You're a CodeChampion."
-    : "📘 Keep practising. You'll get there!";
 }
 
-restartBtn.onclick = () => {
-  currentQuestion = 0;
-  score = 0;
-  resultScreen.classList.add("hidden");
-  quizContainer.classList.remove("hidden");
-  renderQuestion();
-};
+function startTimer() {
+  timerText.innerText = timeLeft;
+  timer = setInterval(() => {
+    timeLeft--;
+    timerText.innerText = timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      handleNext(); // Auto move to next on timeout
+    }
+  }, 1000);
+}
 
-// INIT
-renderQuestion();
+function showScore() {
+  document.querySelector(".quiz-header").style.display = "none";
+  questionBox.style.display = "none";
+  answersBox.style.display = "none";
+  nextBtn.style.display = "none";
+  scoreBox.classList.remove("hide");
+  scoreText.innerText = `${score} / ${filteredQuestions.length}`;
+}
+
+startQuiz();

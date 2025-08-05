@@ -1,4 +1,4 @@
-body {
+/* body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #0e0e0e;
   color: #fff;
@@ -118,4 +118,66 @@ button#restart-btn {
 #quiz-result p {
   font-size: 1.2rem;
   margin: 5px 0;
+} */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+}
+
+.quiz-container {
+  background: #222;
+  border-radius: 10px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+#question-box {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+#answers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #00b894;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #019875;
+}
+
+#progress, #timer, #difficulty {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+#score-box.hide {
+  display: none;
+}
+#score-box {
+  margin-top: 1rem;
+  font-size: 1.2rem;
 }
